@@ -1,0 +1,15 @@
+uvicorn[standard]
+fastapi
+pandas
+numpy
+pydantic
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+tensorflow==2.12.0
+deepface==0.0.79
+opencv-python
+sqlalchemy
+psycopg2==2.9.10
+starlette==0.46.2
+openpyxl

@@ -1,0 +1,9 @@
+#unnecessary files and folders
+venv/
+__pycache__/
+images/ 
+.env
+attendance_records/
+*.csv
+backend.zip
+

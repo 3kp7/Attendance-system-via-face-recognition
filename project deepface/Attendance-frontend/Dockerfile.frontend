@@ -1,0 +1,28 @@
+FROM node:20-slim
+
+# Install system dependencies for Expo and sharp
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy package.json and lock file
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application
+COPY . .
+
+# Expose Expo dev server and web ports
+EXPOSE 8081
+EXPOSE 19000
+EXPOSE 19001
+EXPOSE 19002
+
+# Run the application
+CMD ["npx", "expo", "start", "--web", "--host", "0.0.0.0"]
