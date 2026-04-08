@@ -55,8 +55,8 @@ def get_password_hash(password: str) -> str:
     return bcrypt_context.hash(password)
 
 # Update the `get_user` function to query the actual database
-def get_user(db: Session, username: str) -> Optional[mo.Student]:
-    user = db.query(mo.Student).filter(mo.Student.username == username).first()
+def get_user(db: Session, email: str) -> Optional[mo.Student]:
+    user = db.query(mo.Student).filter(mo.Student.email == email).first()
     if user:
         return user
     return None
@@ -140,11 +140,11 @@ async def read_current_user(current_user: UserInDB = Depends(get_current_user)):
 
 @router.post("/register", response_model=User)
 async def register_user(user: User, db: db_dependency):
-    db_user = db.query(mo.Student).filter(mo.Student.username == user.username).first()
+    db_user = db.query(mo.Student).filter(mo.Student.email == user.email).first()
     if db_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
+        raise HTTPException(status_code=400, detail="Email already registered")
     hashed_password = get_password_hash(user.password)
-    db_user = mo.Student(username=user.username, password=hashed_password, email=user.email)
+    db_user = mo.Student(name=user.name, password=hashed_password, email=user.email, profile_image=user.image_path, disabled=False)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
