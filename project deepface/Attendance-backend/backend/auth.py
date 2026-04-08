@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
 from fastapi import HTTPException, Depends
-from database import SessionLocal, engine
+from .database import SessionLocal, engine
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -11,7 +11,7 @@ import os
 from fastapi import APIRouter
 import datetime
 from datetime import datetime, timedelta, timezone
-import models as mo
+from . import models as mo
 
 router = APIRouter(
     prefix="/auth",
@@ -49,9 +49,13 @@ class UserInDB(User):
     hashed_password: str
 
 def verify_password(plain_password: str, hashed_password: str) :
+    # Truncate password to 72 bytes (bcrypt limit)
+    plain_password = plain_password[:72]
     return bcrypt_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password: str) -> str:
+    # Truncate password to 72 bytes (bcrypt limit)
+    password = password[:72]
     return bcrypt_context.hash(password)
 
 # Update the `get_user` function to query the actual database

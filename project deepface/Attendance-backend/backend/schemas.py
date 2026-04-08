@@ -1,6 +1,6 @@
-from database import SessionLocal, engine
-import models as mo
-import auth
+from .database import SessionLocal, engine
+from . import models as mo
+from . import auth
 from sqlalchemy.exc import IntegrityError
 from datetime import date
 
@@ -22,7 +22,7 @@ def initialize_database():
         if not db.query(mo.Course).filter_by(id=data["id"]).first():
             db.add(mo.Course(**data))
 
-    # Add students
+    # Add/Update students with correct paths
     students = [
         {
             "id": 210208829,
@@ -30,7 +30,7 @@ def initialize_database():
             "last_Name": "Alsayed",
             "email": "abd@gmail.com",
             "password": auth.bcrypt_context.hash("abd123"),
-            "profile_image": "/app/images/bdu.jpg", 
+            "profile_image": "images/bdu.jpg", 
             "disabled": False
         },
         {
@@ -39,7 +39,7 @@ def initialize_database():
             "last_Name": "Al Tamimi",
             "email": "az@gmail.com",
             "password": auth.bcrypt_context.hash("az123"),
-            "profile_image": "/app/images/az.jpg",
+            "profile_image": "images/az.jpg",
             "disabled": False
         },
         {
@@ -48,7 +48,7 @@ def initialize_database():
             "last_Name": "Mansuor",
             "email": "man@gmail.com",
             "password": auth.bcrypt_context.hash("man123"),
-            "profile_image": "/app/images/man.jpg",
+            "profile_image": "images/man.jpg",
             "disabled": False
         },
         {
@@ -57,17 +57,21 @@ def initialize_database():
             "last_Name": "WithJohn",
             "email": "ahm@gmail.com",
             "password": auth.bcrypt_context.hash("ahm123"),
-            "profile_image": "/app/images/ahm.jpg",
+            "profile_image": "images/ahm.jpg",
             "disabled": False
         }
     ]
     for student in students:
-        if not db.query(mo.Student).filter_by(id=student["id"]).first():
+        existing = db.query(mo.Student).filter_by(id=student["id"]).first()
+        if existing:
+            # Update existing student with correct path
+            existing.profile_image = student["profile_image"]
+        else:
             db.add(mo.Student(**student))
 
     db.commit()
 
-    # Enroll both students in all courses
+    # Enroll students in all courses
     all_students = db.query(mo.Student).all()
     all_courses = db.query(mo.Course).all()
     for student in all_students:

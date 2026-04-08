@@ -2,14 +2,16 @@ import React, { useState, useContext } from 'react';
 import { View, Text, Button, Image, ActivityIndicator, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { AuthContext } from '../contexts/authContext';
-import { API_ENDPOINTS } from '../../config/api';
 import { useLocalSearchParams } from 'expo-router';
+import { markAttendance } from '../../api/attendance';
 
 export default function AttendanceScreen() {
   const { authToken } = useContext(AuthContext);
   const { courseId } = useLocalSearchParams(); // We pass courseId from CourseDetails screen
   const [image, setImage] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string>('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
 
   const pickImage = async () => {
     const result = await ImagePicker.launchCameraAsync({
@@ -19,6 +21,7 @@ export default function AttendanceScreen() {
   
     if (!result.canceled && result.assets && result.assets.length > 0) {
       setImage(result.assets[0]);
+      setMessage('');
     }
   };
 
@@ -29,35 +32,24 @@ export default function AttendanceScreen() {
     }
 
     setLoading(true);
+    setMessage('');
 
     try {
-      const formData = new FormData();
-      formData.append('file', {
-        uri: image.uri,
-        name: 'photo.jpg',
-        type: 'image/jpeg',
-      } as any);
+      const result = await markAttendance(authToken, String(courseId), image.uri);
 
-      const response = await fetch(`${API_ENDPOINTS.base}/verify_face/?course_id=${courseId}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          'Content-Type': 'multipart/form-data',
-        },
-        body: formData,
-      });
-
-      const data = await response.json();
-      console.log(data);
-
-      if (response.ok) {
-        Alert.alert('Success', data.message || 'Attendance recorded!');
+      if (result.success) {
+        const msg = result.data?.message || 'Attendance recorded!';
+        setMessage(msg);
+        setMessageType('success');
+        setImage(null);
       } else {
-        Alert.alert('Error', data.detail || 'Failed to mark attendance');
+        setMessage(result.error || 'Failed to mark attendance');
+        setMessageType('error');
       }
     } catch (error) {
       console.error('Error uploading image:', error);
-      Alert.alert('Error', 'Something went wrong');
+      setMessage('Something went wrong');
+      setMessageType('error');
     } finally {
       setLoading(false);
     }
@@ -80,6 +72,20 @@ export default function AttendanceScreen() {
         image && (
           <Button title="Verify Face & Mark Attendance" onPress={uploadImage} color="#0f0D32" />
         )
+      )}
+
+      {message && (
+        <Text
+          style={{
+            marginTop: 20,
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: messageType === 'success' ? '#22c55e' : '#ef4444',
+            textAlign: 'center',
+          }}
+        >
+          {message}
+        </Text>
       )}
     </View>
   );

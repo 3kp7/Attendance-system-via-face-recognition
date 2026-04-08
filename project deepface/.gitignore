@@ -48,6 +48,26 @@ web-build/
 # Project specific
 backend.zip
 *.png
+
+# Additional from backend
+images/
+attendance_records/
+backend.zip
+
+# Additional from frontend
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+.metro-health-check*
+.env*.local
+app-example
 *.jpg
 *.jpeg
 Attendance-backend/images/
