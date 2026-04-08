@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: ./Attendance-backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./Attendance-backend:/app
+    environment:
+      - JWT_SECRET=${JWT_SECRET:-6843a14a0f2056bb9c6adea970b811017b42c8064035f0e5eb23bc41755133a3}
+      - DATABASE_URL=postgresql://postgres:2002@database:5432/Attendance
+    depends_on:
+      - database
+
+  database: 
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=Attendance
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=2002
+  frontend:
+    build:
+      context: ./Attendance-frontend
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./Attendance-frontend:/app
+    depends_on:
+      - backend
+    environment:
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0
+      - API_BASE_URL=http://localhost:8000
+
+volumes:
+  data:
+  
+  
