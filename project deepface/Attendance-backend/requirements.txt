@@ -13,3 +13,4 @@ sqlalchemy
 psycopg2==2.9.10
 starlette==0.46.2
 openpyxl
+schedule

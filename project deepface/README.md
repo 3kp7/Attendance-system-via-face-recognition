@@ -106,6 +106,17 @@ docker-compose up -d
 
 ---
 
+## 🔐 Default Test Users
+
+| Email | Password | Name |
+|-------|----------|------|
+| abd@gmail.com | abd123 | Abdelrahman Alsayed |
+| az@gmail.com | az123 | Aziz Al Tamimi |
+| man@gmail.com | man123 | Mohammed Mansuor |
+| ahm@gmail.com | ahm123 | Ahmed WithJohn |
+
+---
+
 ## 🙌 Acknowledgements
 - [DeepFace](https://github.com/serengil/deepface) for facial recognition
 - [FastAPI](https://fastapi.tiangolo.com/) for backend APIs
